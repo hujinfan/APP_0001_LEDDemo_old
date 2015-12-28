@@ -1,5 +1,6 @@
 package com.example.administrator.app_0001_leddemo;
 
+import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,7 +9,8 @@ import android.widget.Button;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.Toast;
-import com.example.administrator.hardlibrary.*;
+import android.os.ILedService;
+import android.os.ServiceManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,12 +20,13 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox checkBoxLed2 = null;
     private CheckBox checkBoxLed3 = null;
     private CheckBox checkBoxLed4 = null;
+    private ILedService iLedService = null;
 
     class MyButtonListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
 
-            HardControl hardControl = new HardControl();
+
             ledon = !ledon;
             if(ledon){
                 button.setText("ALL OFF");
@@ -31,6 +34,14 @@ public class MainActivity extends AppCompatActivity {
                 checkBoxLed2.setChecked(true);
                 checkBoxLed3.setChecked(true);
                 checkBoxLed4.setChecked(true);
+                for(int i=0; i<4; i++)
+                {
+                    try {
+                        iLedService.ledCtrl(i,1);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
             else{
                 button.setText("ALL ON");
@@ -38,6 +49,14 @@ public class MainActivity extends AppCompatActivity {
                 checkBoxLed2.setChecked(false);
                 checkBoxLed3.setChecked(false);
                 checkBoxLed4.setChecked(false);
+                for(int i=0; i<4; i++)
+                {
+                    try {
+                        iLedService.ledCtrl(i,0);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
     }
@@ -52,40 +71,80 @@ public class MainActivity extends AppCompatActivity {
                 if (checked){
                     // Put some meat on the sandwich
                     Toast.makeText(getApplicationContext(), "LED1 on", Toast.LENGTH_SHORT).show();
+                    try {
+                        iLedService.ledCtrl(0, 1);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
                 }
                 else{
                     // Remove the meat
                     Toast.makeText(getApplicationContext(), "LED1 off", Toast.LENGTH_SHORT).show();
+                    try {
+                        iLedService.ledCtrl(0, 0);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
             case R.id.LED2:
                 if (checked){
                     // Put some meat on the sandwich
                     Toast.makeText(getApplicationContext(), "LED2 on", Toast.LENGTH_SHORT).show();
+                    try {
+                        iLedService.ledCtrl(1, 1);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
                 }
                 else{
                     // Remove the meat
                     Toast.makeText(getApplicationContext(), "LED2 off", Toast.LENGTH_SHORT).show();
+                    try {
+                        iLedService.ledCtrl(1, 0);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
             case R.id.LED3:
                 if (checked){
                     // Put some meat on the sandwich
                     Toast.makeText(getApplicationContext(), "LED3 on", Toast.LENGTH_SHORT).show();
+                    try {
+                        iLedService.ledCtrl(2, 1);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
                 }
                 else{
                     // Remove the meat
                     Toast.makeText(getApplicationContext(), "LED3 off", Toast.LENGTH_SHORT).show();
+                    try {
+                        iLedService.ledCtrl(2, 0);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
             case R.id.LED4:
                 if (checked){
                     // Put some meat on the sandwich
                     Toast.makeText(getApplicationContext(), "LED4 on", Toast.LENGTH_SHORT).show();
+                    try {
+                        iLedService.ledCtrl(3, 1);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
                 }
                 else{
                     // Remove the meat
                     Toast.makeText(getApplicationContext(), "LED4 off", Toast.LENGTH_SHORT).show();
+                    try {
+                        iLedService.ledCtrl(3, 0);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
                 }
                 break;
             // TODO: Veggie sandwich
@@ -103,14 +162,15 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         button = (Button) findViewById(R.id.BUTTON);
-        button.setOnClickListener(new MyButtonListener());
+
+        iLedService = ILedService.Stub.asInterface(ServiceManager.getService("led"));
 
         checkBoxLed1 = (CheckBox)findViewById(R.id.LED1);
         checkBoxLed2 = (CheckBox)findViewById(R.id.LED2);
         checkBoxLed3 = (CheckBox)findViewById(R.id.LED3);
         checkBoxLed4 = (CheckBox)findViewById(R.id.LED4);
 
-
+        button.setOnClickListener(new MyButtonListener());
         /*
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
